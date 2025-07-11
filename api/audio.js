@@ -14,10 +14,13 @@ export default async function handler(req, res) {
       return res.status(404).send("Audio not found");
     }
 
-    res.setHeader("Content-Type", "audio/wav");
-    res.setHeader("Content-Disposition", "inline");
+    const buffer = await response.arrayBuffer();
 
-    response.body.pipe(res); // Stream the audio directly
+    res.setHeader("Content-Type", "audio/wav");
+    res.setHeader("Content-Disposition", "inline; filename=" + filename);
+    res.setHeader("Cache-Control", "public, max-age=31536000");
+
+    res.send(Buffer.from(buffer));
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");
